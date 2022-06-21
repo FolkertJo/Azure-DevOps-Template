@@ -1,0 +1,51 @@
+parameters:
+  includeUnitTest: ''
+  includeSonarQube: ''
+
+jobs: 
+
+  - job: 'BuildApplication'
+    displayName: 'Build FE Solution'
+    steps:
+
+    ########################################################################
+    # When using Docker, this build can be defined in the Dockerfile
+    # The Docker image is the build artifact
+    ########################################################################
+
+    - task: PowerShell@2
+      displayName: 'Build Solution'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Build solution"
+
+    - task: PowerShell@2
+      condition: eq('${{ parameters.includeUnitTest }}', 'true')
+      displayName: 'Run Unittests'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Run Unittests"
+
+    - task: PowerShell@2
+      condition: eq('${{ parameters.includeUnitTest }}', 'true')
+      displayName: 'Run SonarQube'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Run SonarQube scan"
+
+    - task: PowerShell@2
+      displayName: 'Create Build Artifact'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Create Build Artifact"
+
+    - task: PowerShell@2
+      displayName: 'Publish Build Artifact'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Publish Build Artifact"

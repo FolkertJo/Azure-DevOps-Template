@@ -1,0 +1,75 @@
+######################################################
+# ADD GLOBAL VARIABLES
+######################################################
+variables:
+- template: 'variables/pipeline-variables.yaml' 
+
+######################################################
+# DISABLE PR TRIGGER
+######################################################
+pr: none
+
+######################################################
+# TRIGGER ON ANY FEATURE BRANCH
+######################################################
+trigger:
+  batch: true
+  branches:
+    include:
+    - release/*
+    - hotfix/*
+
+######################################################
+# SET AGENT POOL OR IMAGE PREFERENCE
+######################################################
+pool: 
+  vmImage: 'Ubuntu-latest'
+
+######################################################
+# SET RESOURCES AND REPO DEPENDANCIES
+######################################################
+resources:
+- repo: self
+
+######################################################
+# SET STAGES
+######################################################
+stages:
+
+#######################################################
+#### STAGE - BUILD APPLICATION
+#######################################################
+- stage: STAGE_BUILD  
+  displayName: 'Build Stage'
+  jobs:  
+
+  - template: 'templates/template-build.yaml' 
+    parameters:
+      includeUnitTest: true
+      includeSonarQube: true
+
+#######################################################
+#### STAGE - RELEASE TO ACCEPTANCE
+#######################################################
+- stage: STAGE_RELEASE_UAT
+  variables:
+    - template: 'variables/pipeline-variables-uat.yml'
+  displayName: 'STAGE - RELEASE TO UAT'
+  jobs:  
+
+  - template: 'templates/template-release.yaml' 
+    parameters:
+      azureSubscription: ${{ variables.azureSubscription }}
+
+#######################################################
+#### STAGE - RELEASE TO PRODUCTION
+#######################################################
+- stage: STAGE_RELEASE_PRD
+  variables:
+    - template: 'variables/pipeline-variables-prd.yml'
+  displayName: 'STAGE - RELEASE TO PRODUCTION'
+  jobs:  
+
+  - template: 'templates/template-release.yaml' 
+    parameters:
+      azureSubscription: ${{ variables.azureSubscription }}

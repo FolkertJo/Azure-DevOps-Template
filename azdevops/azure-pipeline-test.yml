@@ -1,0 +1,61 @@
+######################################################
+# ADD GLOBAL VARIABLES
+######################################################
+variables:
+- template: 'variables/pipeline-variables.yaml' 
+
+######################################################
+# DISABLE PR TRIGGER
+######################################################
+pr: none
+
+######################################################
+# TRIGGER ON ANY FEATURE BRANCH
+######################################################
+trigger:
+  batch: true
+  branches:
+    include:
+    - develop
+
+######################################################
+# SET AGENT POOL OR IMAGE PREFERENCE
+######################################################
+pool: 
+  vmImage: 'Ubuntu-latest'
+
+######################################################
+# SET RESOURCES AND REPO DEPENDANCIES
+######################################################
+resources:
+- repo: self
+
+######################################################
+# SET STAGES
+######################################################
+stages:
+
+#######################################################
+#### BUILD APPLICATION
+#######################################################
+- stage: STAGE_BUILD  
+  displayName: 'Stage - Build Stage'
+  jobs:  
+
+  - template: 'templates/template-build.yaml' 
+    parameters:
+      includeUnitTest: false
+      includeSonarQube: false
+
+#######################################################
+#### STAGE - RELEASE TO TEST
+#######################################################
+- stage: STAGE_RELEASE_TST
+  variables:
+    - template: 'variables/pipeline-variables-tst.yml'
+  displayName: 'STAGE - RELEASE TO TEST'
+  jobs:  
+
+  - template: 'templates/template-release.yaml' 
+    parameters:
+      azureSubscription: ${{ variables.azureSubscription }}

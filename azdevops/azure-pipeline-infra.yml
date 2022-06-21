@@ -1,0 +1,58 @@
+######################################################
+# ADD GLOBAL VARIABLES
+######################################################
+variables:
+- template: 'variables/pipeline-variables.yaml' 
+
+######################################################
+# DISABLE PR TRIGGER
+######################################################
+pr: none
+
+######################################################
+# DISABLE AUTOMATIC BUILDS
+######################################################
+trigger: none
+
+######################################################
+# SET AGENT POOL OR IMAGE PREFERENCE
+######################################################
+pool: 
+  vmImage: 'Ubuntu-latest'
+
+######################################################
+# SET RESOURCES AND REPO DEPENDANCIES
+######################################################
+resources:
+- repo: self
+
+######################################################
+# SET STAGES
+######################################################
+stages:
+
+#######################################################
+#### STAGE - PROVISION TEST ENVIRONMENT
+#######################################################
+- stage: STAGE_PROVISION_TEST
+  variables:
+    - template: 'variables/pipeline-variables-uat.yml'
+  displayName: '${{ variables.stage-displayname }}'
+  jobs:  
+
+  - template: 'templates/template-release.yaml' 
+    parameters:
+      azureSubscription: ${{ variables.azureSubscription }}
+
+#######################################################
+#### STAGE - RELEASE TO PRODUCTION
+#######################################################
+- stage: STAGE_RELEASE_PRD
+  variables:
+    - template: 'variables/pipeline-variables-prd.yml'
+  displayName: '${{ variables.stage-displayname }}'
+  jobs:  
+
+  - template: 'templates/template-release.yaml' 
+    parameters:
+      azureSubscription: ${{ variables.azureSubscription }}

@@ -1,0 +1,2 @@
+variables: # Azure Devops
+  azureSubscription: '[name of the azure devops service connection]'

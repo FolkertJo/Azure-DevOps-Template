@@ -1,0 +1,47 @@
+######################################################
+# ADD GLOBAL VARIABLES
+######################################################
+variables:
+- template: 'variables/pipeline-variables.yaml' 
+
+######################################################
+# ENABLE TRIGGER ON PR TO DEVELOP
+######################################################
+pr:
+  branches:
+    include:
+    - develop 
+
+######################################################
+# DISABLE CI TRIGGER
+######################################################
+trigger: none
+
+######################################################
+# SET AGENT POOL OR IMAGE PREFERENCE
+######################################################
+pool: 
+  vmImage: 'Ubuntu-latest'
+
+######################################################
+# SET RESOURCES AND REPO DEPENDANCIES
+######################################################
+resources:
+- repo: self
+
+######################################################
+# SET STAGES
+######################################################
+stages:
+
+#######################################################
+#### BUILD APPLICATION
+#######################################################
+- stage: STAGE_BUILD  
+  displayName: 'Build Stage'
+  jobs:  
+
+  - template: 'templates/template-build.yaml' 
+    parameters:
+      includeUnitTest: true
+      includeSonarQube: true

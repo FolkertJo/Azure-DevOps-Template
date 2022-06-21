@@ -1,0 +1,56 @@
+parameters:
+  environment: ''
+  azureSubscription: ''
+  azureKeyvaultPlatform: ''
+  azureContainerRegistry: ''
+  dockerImageName: ''
+  dockerImageTag: ''
+  appName: ''
+  slotName: ''  
+
+jobs: 
+
+  - deployment: 'ReleaseApplication'   
+    displayName: 'Update Image'    
+    environment: '${{ parameters.environment }}'   
+    strategy:
+      runOnce:
+        deploy:       
+          steps:
+
+          - download: none
+          - checkout: self
+
+          - task: AzureKeyVault@1
+            displayName: 'Get Key Vault Secrets'
+            inputs:
+              azureSubscription: '${{ parameters.azureSubscription }}'
+              keyVaultName: '${{ parameters.azureKeyvaultPlatform }}'
+              secretsFilter: '*'
+
+          - task: AzureWebAppContainer@1
+            displayName: 'Update image to tag ${{ parameters.dockerImageTag }}'
+            inputs:
+              azureSubscription: '${{ parameters.azureSubscription }}'
+              appName: '${{ parameters.appName }}'
+              slotName: '${{ parameters.slotName }}'
+              containers: '${{ parameters.azureContainerRegistry }}/${{ parameters.dockerImageName }}:${{ parameters.dockerImageTag }}'    
+
+           - task: AzureAppServiceSettings@1
+            displayName: Azure App Service Settings
+            inputs:
+              azureSubscription: '${{ parameters.azureSubscription }}'
+              appName: '${{ parameters.appName }}'
+              slotName: '${{ parameters.slotName }}'
+              appSettings: |
+                [
+                  {
+                    "name": "APP_NAME",
+                    "value": "Name of the application",
+                    "slotSetting": false
+                  },
+                  {
+                    "name": "APP_VERSION",
+                    "value": "${{ parameters.dockerImageTag }}",
+                    "slotSetting": false
+                  }
