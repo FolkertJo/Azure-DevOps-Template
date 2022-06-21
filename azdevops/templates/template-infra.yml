@@ -1,0 +1,47 @@
+parameters:
+  environment: ''
+  azureSubscription: ''
+  appName: ''
+
+jobs: 
+
+  - deployment: 'CreateGroup_${{ brand.name }}'    
+    variables:
+      - name: resourceGroup
+        value: '${{ parameters.environment }}-[client name]-[busniess unit]-[project]-[appName]'
+    displayName: "Create Resources"
+    environment: '${{ parameters.environment }}'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            # CREATE RESOURCEGROUP
+            - task: AzureCLI@2
+              displayName: 'Create Resource Group' 
+              inputs:
+                azureSubscription: '${{ parameters.azureSubscription }}'
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: ''
+
+            # CREATE SERVICEPLAN
+            - task: AzureCLI@2
+              displayName: 'Create app serviceplan' 
+              inputs:
+                azureSubscription: '${{ parameters.azureSubscription }}'
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: ''
+
+            # CREATE WEBAPP
+            - task: AzureCLI@2
+              displayName: "Create azure webapp"
+              inputs:
+                azureSubscription: '${{ parameters.azureSubscription }}'
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: ''
+
+    

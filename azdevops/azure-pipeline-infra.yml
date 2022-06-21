@@ -36,23 +36,9 @@ stages:
 #######################################################
 - stage: STAGE_PROVISION_TEST
   variables:
-    - template: 'variables/pipeline-variables-uat.yml'
-  displayName: '${{ variables.stage-displayname }}'
+    - template: 'variables/pipeline-variables-tst.yml' 
   jobs:  
 
-  - template: 'templates/template-release.yaml' 
-    parameters:
-      azureSubscription: ${{ variables.azureSubscription }}
-
-#######################################################
-#### STAGE - RELEASE TO PRODUCTION
-#######################################################
-- stage: STAGE_RELEASE_PRD
-  variables:
-    - template: 'variables/pipeline-variables-prd.yml'
-  displayName: '${{ variables.stage-displayname }}'
-  jobs:  
-
-  - template: 'templates/template-release.yaml' 
+  - template: 'templates/template-infra.yaml' 
     parameters:
       azureSubscription: ${{ variables.azureSubscription }}
