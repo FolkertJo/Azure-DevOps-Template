@@ -1,3 +1,2 @@
 variables:
   environment: 'prd'
-  stage-displayname: 'STAGE - RELEASE TO PRD'
